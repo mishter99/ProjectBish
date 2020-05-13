@@ -254,12 +254,15 @@ async def download(gdrive, service, uri=None):
             file = await gdrive.get_reply_message()
             file_name = file.file.name
             file_path = TEMP_DOWNLOAD_DIRECTORY + file_name
+            if isfile(file_path):
+                os.remove(file_path)
             downloaded_file_name = await gdrive.client.download_media(
                 file,
                 file_path,
                 progress_callback=lambda d, t: asyncio.get_event_loop(
                 ).create_task(progress(d, t, gdrive, current_time,
                                        "[FILE - DOWNLOAD]",
+                                       file_name=file_name,
                                        is_cancelled=is_cancelled)))
         except CancelProcess:
             os.remove(file_path)
